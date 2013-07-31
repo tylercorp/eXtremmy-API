@@ -45,3 +45,16 @@ POST /poi
 < 200
 < Content-Type: application/json
 { "ID": 42 }
+
+
+
+GET /spot/{id}/images
+> Accept: application/json
+< 200
+<Content-Type application/json
+[
+    {
+        "id": "" ,
+        "path": "/imnages/photo/spot.jpg"
+    }
+]
