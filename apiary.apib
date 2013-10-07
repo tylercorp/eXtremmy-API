@@ -3,58 +3,25 @@ HOST: http://v1.api.extremmy.com
 --- eXtremmy API ---
 
 ---
-    В случае возникновения любой ошибки ожидается application/json 
-    обект с полями error (идентификатор), message (сообщение для лоогов), 
-    userMessage (опциональное сообщение для пользователя).
+В случае возникновения любой ошибки ожидается application/json 
+обект с полями error (идентификатор), message (сообщение для логов), 
+userMessage (опциональное сообщение для пользователя).
 ---
 
 -- 
-Точки интереса 
-Точки для отображжения на карте
+Sports
+Виды спорта
 --
-
-GET /poi/list{?$top,$skip}
+Список видов спорта
+GET /sports/list
 > Accept: application/json
 < 200
-< Content-Type: application/json
+<Content-Type: application/json
 [    
     {
-        "ID": 0,
-        "label": "Orient Jumping",
-        "coordinate": [54.069073,-10.340239],
-        "type": "skydiving"
+        "ID": 1,
+        "name": "Snowboarding / Ski",
+        "alias": "snowboarding"
     }
 ]
 
-GET /poi/{poi-id}/description
-> Accept: text/html
-< 200
-< Content-Type: text/html
-<p>
-   Several paragraphs in light HTML markup 
-</p>
-
-POST /poi
-> Content-Type: application/json
-> Accept: application/json
-{ 
-    "label": "My new point", 
-    "coordinate": [55.990154,37.409945],
-    "type": "windserfing"
-}
-< 200
-< Content-Type: application/json
-{ "ID": 42 }
-
-
-
-GET /spot/{id}/images
-> Accept: application/json
-< 200
-<Content-Type application/json
-[
-    {
-        "name":"trt5434x434232"   ,
-        "path": "/imnages/photo/spot.jpg"
-    }
-]
