@@ -1,22 +1,20 @@
-HOST: http://v1.api.extremmy.com
+HOST: http://api.extremmy.com/
 
 --- eXtremmy API ---
 
 ---
-В случае возникновения любой ошибки ожидается application/json 
-обект с полями error (идентификатор), message (сообщение для логов), 
-userMessage (опциональное сообщение для пользователя).
+    В случае возникновения любой ошибки ожидается application/json 
+    обект с полями error (идентификатор), message (сообщение для логов), 
+    userMessage (опциональное сообщение для пользователя).
 ---
 
 -- 
-Sports
 Виды спорта
 --
-Список видов спорта
 GET /sports/list
 > Accept: application/json
 < 200
-<Content-Type: application/json
+< Content-Type: application/json
 [    
     {
         "ID": 1,
@@ -25,14 +23,26 @@ GET /sports/list
     }
 ]
 
+-- 
+Споты
 --
-Spots
---
-Список спотов
+
 GET /spots/list{?limit,offset}
 > Accept: application/json
+> If-Modified-Since: Mon, 3 Jun 2013 00:00:00 GMT
+< 304
++++++
+< 503
+< Content-Type: application/json
+{ 
+    "error": 401,
+    "message": "Unknown error.",
+    "userMessage": "Unknown error. Please try again later."
+}
++++++
 < 200
-< Contetnt-Type: application/json
+< Content-Type: application/json
+< Last-Modified: Mon, 3 Jun 2013 00:00:00 GMT
 [    
     {
         "ID": 1,
@@ -43,4 +53,270 @@ GET /spots/list{?limit,offset}
     }
 ]
 
+GET /spots/description/{id}/
+> Accept: text/html
+> If-Modified-Since: Mon, 3 Jun 2013 00:00:00 GMT
+< 304
++++++
+< 200
+< Content-Type: text/html
+<p>
+   Several paragraphs in light HTML markup 
+</p>
 
+GET /spots/events/{id}/{?from,till,limit}
+> Accept: application/json
+> If-Modified-Since: Mon, 3 Jun 2013 00:00:00 GMT
+< 200
+< Content-Type: application/json
+[    
+    {
+        "ID": 1,
+        "name": "Orient Jumping Event",
+        "from": 2013-06-06,
+        "till": 2013-07-07,
+        "spots": [1, 5, 38],
+        "sports": [2,4],
+        "users": [3, 48, 172],
+        "owner": 3,
+        "created": 2013-05-05,
+    }
+]
+
+Add spot. Parameters:
+
++ <b>name</b> - spot name, required
++ <b>lat</b> - spot latitude, required
++ <b>lng</b> - spot longtitude, required
++ <b>sport</b> - sports, array, required
++ <b>[description]</b> - spot description, text
++ <b>[url]</b> - spot website url
++ <b>[has_rent]</b> - if spot has rent service, bool
++ <b>[has_rooms]</b> - if spot has rooms service, bool
++ <b>[has_lessons]</b> - if spot has lessons service, bool
++ <b>[address]</b> - adress (from geolocation)
++ <b>[country]</b> - country (from geolocation)
++ <b>[rating]</b> - rating, 1 to 5
+POST /spots/add
+> Authorization: apikey:XXX
+> Content-Type: application/json
+> Accept: application/json
+name=spotName&lat=12.123123&lng=-11.124214124&sport[]=1&sport[]=3
+< 400
+< Content-Type: application/json
+{ 
+    "error": 400,
+    "message": "Validation error.",
+    "userMessage": "Validation error." 
+    "field": {
+            "name": ["Name cannot be blank."]
+            }
+}
++++++
+< 200
+< Content-Type: application/json
+{ 
+    "status": "ok",
+    "data": {
+        "id": 1
+    }
+}
+
+Add comment to spot. Parameters:
+
++ <b>spot_id</b> - spot id, required
++ <b>text</b> - message text, required
++ <b>[parent_id]</b> - parent comment ID
+POST /spots/addComment
+> Authorization: apikey:XXX
+> Content-Type: application/json
+> Accept: application/json
+spot_id=1&parent_id=2&text=Message
+< 400
+< Content-Type: application/json
+{ 
+    "error": 400,
+    "message": "Validation error.",
+    "userMessage": "Validation error." 
+    "field": {
+            "text": ["Text cannot be blank."]
+            }
+}
++++++
+< 200
+< Content-Type: application/json
+{ "status": "ok" }
+
+-- 
+Эвенты
+--
+Список эвентов
+GET /events/list{?spotId,from,till,limit,offset}
+> Accept: application/json
+> If-Modified-Since: Mon, 3 Jun 2013 00:00:00 GMT
+< 304
++++++
+< 503
+< Content-Type: application/json
+{ 
+    "error": 401,
+    "message": "Unknown error.",
+    "userMessage": "Unknown error. Please try again later."
+}
++++++
+< 200
+< Content-Type: application/json
+< Last-Modified: Mon, 3 Jun 2013 00:00:00 GMT
+[    
+    {
+        "ID": 1,
+        "name": "Orient Jumping Event",
+        "from": 2013-06-06,
+        "till": 2013-07-07,
+        "spots": [313,315],
+        "sports": [1,3],
+        "author": {
+            "ID": 1, 
+            "username":"UserName"
+            },
+    }
+]
+
+GET /events/{id}
+> Accept: application/json
+> If-Modified-Since: Mon, 3 Jun 2013 00:00:00 GMT
+< 200
+< Content-Type: application/json
+{
+    "ID": 1,
+    "name": "Orient Jumping Event",
+    "from": 2013-06-06,
+    "till": 2013-07-07,
+    "spots": [1, 5, 38],
+    "sports": ["skydiving", "wakeboarding"],
+    "users": [3, 48, 172],
+}
+
+GET /events/description/{id}/
+> Accept: text/html
+> If-Modified-Since: Mon, 3 Jun 2013 00:00:00 GMT
+< 304
++++++
+< 200
+< Content-Type: text/html
+<p>
+   Several paragraphs in light HTML markup 
+</p>
+
+
+GET /events/comments/{id}{?limit,offset}
+> Accept: application/json
+> If-Modified-Since: Mon, 3 Jun 2013 00:00:00 GMT
+< 200
+< Content-Type: application/json
+[
+    {
+        "ID": 1,
+        "text": "Orient Jumping Event",
+        "created": "2013-06-06",
+        "author": {
+            "ID": 1, 
+            "username":"UserName"
+            },
+    }
+]
+
+-- 
+Users
+--
+
+Register new user. Parameters:
+
++ <b>username</b> - user name, string, required
++ <b>email</b> - user email, string, required
++ <b>password</b> - user password, string, required
++ <b>[sports]</b> - user sports, array of int
++ <b>[country_id]</b> - user country code, string, format: RU
++ <b>[city]</b> - user city, string
++ <b>[birthday]</b> - user birthday, string, format: YYYY-MM-DD
+POST /users/register
+> Content-Type: application/json
+> Accept: application/json
+< 400
+< Content-Type: application/json
+{ 
+    "error": 400,
+    "message": "Validation error.",
+    "userMessage": "Validation error." 
+    "field": {
+        "username":["Username cannot be blank."],
+        "email":["E-mail cannot be blank."],
+        "password":["Password cannot be blank."]
+        }
+}
++++++
+< 200
+< Content-Type: application/json
+{ "status": "ok" }
+
+
+Authenticate user. Parameters:
+
++ <b>username</b> - user name, string, required
++ <b>password</b> - user password, string, required
++ <b>device_uid</b> - user device unical id, string, required
++ <b>device_os</b> - user device os, int, required (1 - iOs, 2 - Android, 3 - Windows Phone)
+POST /users/authenticate
+> Accept: application/json
+username=UserName&password=Password&device_uid=Device-Unique-Id&device_os=1
+< 200
+< Content-Type: application/json
+{
+    "status":"ok",
+    "data": {
+        "key":"Mobile-Api-Key",
+    }
+}
++++++
+< 400
+< Content-Type: application/json
+{
+    "error":400,
+    "message":"Validation error.",
+    "userMessage":"Validation error.",
+    "field":{
+        "username":["Username or e-mail cannot be blank."],
+        "password":["Password cannot be blank."],
+        "device_uid":["Device Uid cannot be blank."],
+        "device_os":["Device Os cannot be blank."]
+    }
+}
+
+Check user key. Parameters:
+
++ <b>device_uid</b> - user device unical id, string, required
+POST /users/check
+> Accept: application/json
+> Authorization: apikey:XXX
+device_uid=Device-Unique-Id
+< 200
+< Content-Type: application/json
+{
+    "status":"ok",
+    "data": {
+        "user": {
+            "ID":2,
+            "username":"Username",
+            "avatar":"Avatar-File.jpg"
+        }
+    }
+}
++++++
+< 400
+< Content-Type: application/json
+{
+    "error":401,
+    "message":"User not found or wrong key/uid pair.",
+    "userMessage":"User not found.",
+}
+Status API Training Shop Blog About © 2013 GitHub, Inc. Terms Privacy Security Contact 
