@@ -25,3 +25,22 @@ GET /sports/list
     }
 ]
 
+--
+Spots
+--
+Список спотов
+GET /spots/list{?limit,offset}
+> Accept: application/json
+< 200
+< Contetnt-Type: application/json
+[    
+    {
+        "ID": 1,
+        "name": "Orient Jumping",
+        "coordinate": [54.069073,-10.340239],
+        "sports": [1,3],
+        "rating": 3
+    }
+]
+
+
